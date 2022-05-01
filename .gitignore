@@ -6,3 +6,4 @@ args.js
 hardhat*
 package*
 script.js
+node_modules/
