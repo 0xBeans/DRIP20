@@ -1,0 +1,11 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "hardhat": "^2.9.3"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "hardhat-gas-reporter": "^1.0.8"
+  }
+}
