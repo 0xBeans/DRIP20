@@ -185,6 +185,9 @@ abstract contract GIGADRIP20 {
         // from the updated block and updated multiplier if the addr was already accruing
         if (accruer.accrualStartBlock != 0) {
             accruer.balance = balanceOf(addr);
+        } else {
+            // emit Transfer event when new address starts dripping
+            emit Transfer(address(0), addr, 0);
         }
     }
 

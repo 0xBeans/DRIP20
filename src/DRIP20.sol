@@ -166,6 +166,9 @@ abstract contract DRIP20 {
         }
 
         _accrualStartBlock[addr] = block.number;
+
+        // emit Transfer event when new address starts dripping
+        emit Transfer(address(0), addr, 0);
     }
 
     /**
