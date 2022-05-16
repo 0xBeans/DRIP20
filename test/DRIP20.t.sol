@@ -17,6 +17,13 @@ interface Vm {
     function roll(uint256) external;
 
     function expectRevert(bytes calldata) external;
+
+    function expectEmit(
+        bool,
+        bool,
+        bool,
+        bool
+    ) external;
 }
 
 contract DRIP20Test is DSTest {
@@ -27,6 +34,8 @@ contract DRIP20Test is DSTest {
     address user3;
 
     Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+
+    event Transfer(address indexed from, address indexed to, uint256 amount);
 
     function setUp() public {
         token = new MockDRIP20("MOCK", "MOCK", 18, 10); // token emission is 10 per block
@@ -79,6 +88,11 @@ contract DRIP20Test is DSTest {
     function testDripSingleUser() public {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
+
+        // check event is emitted
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(0), user1, 0);
+
         token.startDripping(user1);
 
         assertEq(token.totalSupply(), 0);

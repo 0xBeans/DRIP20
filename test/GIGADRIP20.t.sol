@@ -18,6 +18,13 @@ interface Vm {
     function roll(uint256) external;
 
     function expectRevert(bytes calldata) external;
+
+    function expectEmit(
+        bool,
+        bool,
+        bool,
+        bool
+    ) external;
 }
 
 contract GIGADRIP20Test is DSTest {
@@ -28,6 +35,8 @@ contract GIGADRIP20Test is DSTest {
     address user3;
 
     Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+
+    event Transfer(address indexed from, address indexed to, uint256 amount);
 
     function setUp() public {
         token = new MockGIGADRIP20("MOCK", "MOCK", 18, 10); // token emission is 10 per block
@@ -49,6 +58,46 @@ contract GIGADRIP20Test is DSTest {
 
         assertEq(token.totalSupply(), 120);
         assertEq(token.balanceOf(user1), 120);
+    }
+
+    // Checks to see if adding a user multiple times to a drip increases multiplier correctly
+    // Also check events are emitted correctly
+    function testStreamSingUserMultiDrip() public {
+        // need to start on a non zero block number since we use block 0 as 'not Dripping'
+        vm.roll(1);
+        // check event is emitted
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(0), user1, 0);
+        // multiplier should add to 3
+        token.startDripping(user1, 1);
+        token.startDripping(user1, 1);
+        token.startDripping(user1, 1);
+        vm.roll(5);
+
+        assertEq(token.totalSupply(), 120);
+        assertEq(token.balanceOf(user1), 120);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(0), user2, 0);
+        token.startDripping(user2, 1);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(0), user3, 0);
+        token.startDripping(user3, 2);
+
+        // nothing should change since we didnt roll blocks
+        assertEq(token.totalSupply(), 120);
+        assertEq(token.balanceOf(user1), 120);
+        assertEq(token.balanceOf(user2), 0);
+        assertEq(token.balanceOf(user3), 0);
+
+        // roll 5 blocks, each user should've accrued 50 * multiplier tokens
+        vm.roll(10);
+
+        assertEq(token.totalSupply(), 120 + 50 * 6);
+        assertEq(token.balanceOf(user1), 120 + 50 * 3);
+        assertEq(token.balanceOf(user2), 50);
+        assertEq(token.balanceOf(user3), 50 * 2);
     }
 
     function testStreamMultiUserMultiplier() public {

@@ -171,6 +171,14 @@ abstract contract GIGADRIP20 {
     function _startDripping(address addr, uint256 multiplier) internal virtual {
         Accruer storage accruer = _accruers[addr];
 
+        // need to update the balance if wallet was already accruing
+        if (accruer.accrualStartBlock != 0) {
+            accruer.balance = balanceOf(addr);
+        } else {
+            // emit Transfer event when new address starts dripping
+            emit Transfer(address(0), addr, 0);
+        }
+
         _currAccrued = totalSupply();
         _currEmissionBlockNum = block.number;
         accruer.accrualStartBlock = block.number;
@@ -179,15 +187,6 @@ abstract contract GIGADRIP20 {
         unchecked {
             _currEmissionMultiple += multiplier;
             accruer.multiplier += multiplier;
-        }
-
-        // need to update the balance to start "fresh"
-        // from the updated block and updated multiplier if the addr was already accruing
-        if (accruer.accrualStartBlock != 0) {
-            accruer.balance = balanceOf(addr);
-        } else {
-            // emit Transfer event when new address starts dripping
-            emit Transfer(address(0), addr, 0);
         }
     }
 
