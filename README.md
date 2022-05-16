@@ -71,4 +71,3 @@ Feel free to submit a PR for anything
 - Potentially add EIP-2612.
 - Potentially have mutable emissions - would need to be careful about totalSupply() calculations and ensure proper emission block calculations.
 - Potentially write extensions with `maxSupply` and emission stoppage functionality.
-- Transfer Event
