@@ -53,6 +53,8 @@ Will release this as a package soon, but as of now, feel free to copy pasta (wou
 
 This is the base implementation of ERC20 tokens that support dripping. So, these are things you should know:
 
+Since token dripping per block does not emit any events, token indexers such as Etherscan may not show the correct holder balances. We emit a transfer event when an address begins dripping, however, transfer events to update balances don't get emitted until an explicit transfer happens. Thus, token indexers will show the correct # of holders but balances of each holder will be a lower bound. Other rebasing tokens face this issue as well (maybe this will get fixed once indexers don't solely rely on events).
+
 There is no `maxSupply` or global `stopDripping` function. I initially designed this for a game where the game economy continues to grow and inflate. Think about Maplestory or Axie Infinity, their in-game currency doesn't have a `maxSupply` because that would stunt game growth and worsen playability (nor does it plan to prevent wallets from earning in the future). The economy just continues to grow and inflate as they add users.
 
 Also, because this is a `base` implementation, I believe the implementing contract should define the logic for `maxSupply` or the logic for stopping emissions completely. Similarly to OpenZeppelin's base ERC20 implementation, it doesn't specify a `maxSupply` and it's on the implementing contract to add this logic if desired. Tbh, You could probably write some cool functions to stop wallet streaming (since you get gas refunds on this since you're clearing storage).
