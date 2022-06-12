@@ -98,7 +98,7 @@ contract DRIP20Test is DSTest {
         assertEq(token.totalSupply(), 0);
         assertEq(token.balanceOf(user1), 0);
 
-        // should accumulat 4 * 10 tokens
+        // should accumulate 4 * 10 tokens
         vm.roll(5);
 
         assertEq(token.totalSupply(), 40);
