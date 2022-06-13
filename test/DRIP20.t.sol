@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "ds-test/test.sol";
 import {console} from "forge-std/console.sol";
 import {MockDRIP20} from "./mocks/MockDRIP20.sol";
+import {DRIP20} from "../src/DRIP20.sol";
 
 interface Vm {
     function prank(address) external;
@@ -17,6 +18,7 @@ interface Vm {
     function roll(uint256) external;
 
     function expectRevert(bytes calldata) external;
+    function expectRevert(bytes4) external;
 
     function expectEmit(
         bool,
@@ -289,14 +291,14 @@ contract DRIP20Test is DSTest {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
         token.startDripping(user1);
-        vm.expectRevert(bytes("user already accruing"));
+        vm.expectRevert(DRIP20.UserAlreadyAccruing.selector);
         token.startDripping(user1);
     }
 
     function testRevertStopDrip() public {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
-        vm.expectRevert(bytes("user not accruing"));
+        vm.expectRevert(DRIP20.UserNotAccruing.selector);
         token.stopDripping(user1);
     }
 }
