@@ -168,7 +168,8 @@ abstract contract GIGADRIP20 {
      * @param multiplier used to increase token drip. ie if 1 NFT drips 10 tokens per block and this address has 3 NFTs,
      * the user would need to get dripped 30 tokens per block - multipler would multiply emissions by 3
      */
-    function _startDripping(address addr, uint256 multiplier) internal virtual {
+    function _startDripping(address addr, uint256 multiplier) internal virtual
+    {
         Accruer storage accruer = _accruers[addr];
 
         // need to update the balance if wallet was already accruing
