@@ -294,6 +294,14 @@ contract DRIP20Test is DSTest {
         token.transfer(user2, 50);
     }
 
+    function testRevertBurnMoreThanBalance() public {
+        vm.startPrank(user1);
+        token.mint(40);
+
+        vm.expectRevert(stdError.arithmeticError);
+        token.burn(user1, 50);
+    }
+
     function testRevertStartDrip() public {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
