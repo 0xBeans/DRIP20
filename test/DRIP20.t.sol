@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
 import {console} from "forge-std/console.sol";
+import {stdError} from "forge-std/Test.sol";
 import {MockDRIP20} from "./mocks/MockDRIP20.sol";
 
 interface Vm {
@@ -283,6 +284,14 @@ contract DRIP20Test is DSTest {
 
         assertEq(token.totalSupply(), 50);
         assertEq(token.balanceOf(user1), 50);
+    }
+
+    function testRevertTransferMoreThanBalance() public {
+        vm.startPrank(user1);
+        token.mint(40);
+
+        vm.expectRevert(stdError.arithmeticError);
+        token.transfer(user2, 50);
     }
 
     function testRevertStartDrip() public {
