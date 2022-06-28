@@ -43,9 +43,9 @@ abstract contract GIGADRIP20 {
     ==============================================================*/
 
     struct Accruer {
-        uint256 multiplier;
         uint256 balance;
-        uint256 accrualStartBlock;
+        uint128 accrualStartBlock;
+        uint128 multiplier;
     }
 
     // immutable token emission rate per block
@@ -56,8 +56,8 @@ abstract contract GIGADRIP20 {
 
     // these are all for calculating totalSupply()
     uint256 private _currAccrued;
-    uint256 private _currEmissionBlockNum;
-    uint256 private _currEmissionMultiple;
+    uint128 private _currEmissionBlockNum;
+    uint128 private _currEmissionMultiple;
 
     constructor(
         string memory _name,
@@ -150,7 +150,7 @@ abstract contract GIGADRIP20 {
         }
 
         if (fromAccruer.accrualStartBlock != 0) {
-            fromAccruer.accrualStartBlock = block.number;
+            fromAccruer.accrualStartBlock = uint128(block.number);
         }
 
         emit Transfer(from, to, amount);
@@ -168,7 +168,7 @@ abstract contract GIGADRIP20 {
      * @param multiplier used to increase token drip. ie if 1 NFT drips 10 tokens per block and this address has 3 NFTs,
      * the user would need to get dripped 30 tokens per block - multipler would multiply emissions by 3
      */
-    function _startDripping(address addr, uint256 multiplier) internal virtual {
+    function _startDripping(address addr, uint128 multiplier) internal virtual {
         Accruer storage accruer = _accruers[addr];
 
         // need to update the balance if wallet was already accruing
@@ -180,8 +180,8 @@ abstract contract GIGADRIP20 {
         }
 
         _currAccrued = totalSupply();
-        _currEmissionBlockNum = block.number;
-        accruer.accrualStartBlock = block.number;
+        _currEmissionBlockNum = uint128(block.number);
+        accruer.accrualStartBlock = uint128(block.number);
 
         // should not overflow unless you have >2**256-1 items...
         unchecked {
@@ -199,7 +199,7 @@ abstract contract GIGADRIP20 {
      * @param multiplier used to decrease token drip. ie if addr has a multiplier of 3 already, passing in a value of 1 would decrease
      * the multiplier to 2
      */
-    function _stopDripping(address addr, uint256 multiplier) internal virtual {
+    function _stopDripping(address addr, uint128 multiplier) internal virtual {
         Accruer storage accruer = _accruers[addr];
 
         // should I check for 0 multiplier too
@@ -207,7 +207,7 @@ abstract contract GIGADRIP20 {
 
         accruer.balance = balanceOf(addr);
         _currAccrued = totalSupply();
-        _currEmissionBlockNum = block.number;
+        _currEmissionBlockNum = uint128(block.number);
 
         // will revert if underflow occurs
         _currEmissionMultiple -= multiplier;
@@ -216,7 +216,7 @@ abstract contract GIGADRIP20 {
         if (accruer.multiplier == 0) {
             accruer.accrualStartBlock = 0;
         } else {
-            accruer.accrualStartBlock = block.number;
+            accruer.accrualStartBlock = uint128(block.number);
         }
     }
 
@@ -240,7 +240,7 @@ abstract contract GIGADRIP20 {
 
         // have to update supply before burning
         _currAccrued = totalSupply();
-        _currEmissionBlockNum = block.number;
+        _currEmissionBlockNum = uint128(block.number);
 
         accruer.balance = balanceOf(from) - amount;
 
@@ -252,7 +252,7 @@ abstract contract GIGADRIP20 {
 
         // update accruers block number if user was accruing
         if (accruer.accrualStartBlock != 0) {
-            accruer.accrualStartBlock = block.number;
+            accruer.accrualStartBlock = uint128(block.number);
         }
 
         emit Transfer(from, address(0), amount);

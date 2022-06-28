@@ -35,8 +35,7 @@ For NFT projects, you can override ERC721 transfer() to call `_startDripping()` 
 
 Both `DRIP20.sol` and `GIGADRIP20.sol` are very comparable in gas usage, in some scenarios even cheaper.
 
-![DRIP20 Gas Report](/gas-report/DRIP20-gas-report.png "DRIP20 Gas Report")
-![GIGADRIP20 Gas Report](/gas-report/GIGADRIP20-gas-report.png "GIGADRIP20 Gas Report")
+Check out the report in `gas-report.txt`
 
 
 ## Security
