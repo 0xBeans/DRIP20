@@ -7,8 +7,14 @@ pragma solidity ^0.8.0;
 ///@notice ever having to send a separate transaction to 'claim' tokens.
 ///@notice shout out to solmate (@t11s) for the slim and efficient ERC20 implementation!
 ///@notice shout out to superfluid and UBI for the dripping inspiration!
-
 abstract contract DRIP20 {
+    /*==============================================================
+    ==                            ERRORS                          ==
+    ==============================================================*/
+    error UserNotAccruing();
+    error UserAlreadyAccruing();
+    error ERC20_TransferToZeroAddress();
+
     /*==============================================================
     ==                            EVENTS                          ==
     ==============================================================*/
@@ -86,7 +92,7 @@ abstract contract DRIP20 {
         address to,
         uint256 amount
     ) internal virtual {
-        require(to != address(0), "ERC20: transfer to the zero address");
+        if (to == address(0)) revert ERC20_TransferToZeroAddress();
 
         _balance[from] = balanceOf(from) - amount;
 
@@ -157,7 +163,8 @@ abstract contract DRIP20 {
      * @param addr address to drip to
      */
     function _startDripping(address addr) internal virtual {
-        require(_accrualStartBlock[addr] == 0, "user already accruing");
+        if (_accrualStartBlock[addr] != 0) revert UserAlreadyAccruing();
+
         _currAccrued = totalSupply();
         _currEmissionBlockNum = block.number;
 
@@ -178,7 +185,8 @@ abstract contract DRIP20 {
      * @param addr address to stop dripping to
      */
     function _stopDripping(address addr) internal virtual {
-        require(_accrualStartBlock[addr] != 0, "user not accruing");
+        if (_accrualStartBlock[addr] == 0) revert UserNotAccruing();
+
         _balance[addr] = balanceOf(addr);
         _currAccrued = totalSupply();
         _currEmissionBlockNum = block.number;

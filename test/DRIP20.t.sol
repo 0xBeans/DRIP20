@@ -3,7 +3,9 @@ pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
 import {console} from "forge-std/console.sol";
+import {stdError} from "forge-std/Test.sol";
 import {MockDRIP20} from "./mocks/MockDRIP20.sol";
+import {DRIP20} from "../src/DRIP20.sol";
 
 interface Vm {
     function prank(address) external;
@@ -17,6 +19,7 @@ interface Vm {
     function roll(uint256) external;
 
     function expectRevert(bytes calldata) external;
+    function expectRevert(bytes4) external;
 
     function expectEmit(
         bool,
@@ -98,7 +101,7 @@ contract DRIP20Test is DSTest {
         assertEq(token.totalSupply(), 0);
         assertEq(token.balanceOf(user1), 0);
 
-        // should accumulat 4 * 10 tokens
+        // should accumulate 4 * 10 tokens
         vm.roll(5);
 
         assertEq(token.totalSupply(), 40);
@@ -285,18 +288,34 @@ contract DRIP20Test is DSTest {
         assertEq(token.balanceOf(user1), 50);
     }
 
+    function testRevertTransferMoreThanBalance() public {
+        vm.startPrank(user1);
+        token.mint(40);
+
+        vm.expectRevert(stdError.arithmeticError);
+        token.transfer(user2, 50);
+    }
+
+    function testRevertBurnMoreThanBalance() public {
+        vm.startPrank(user1);
+        token.mint(40);
+
+        vm.expectRevert(stdError.arithmeticError);
+        token.burn(user1, 50);
+    }
+
     function testRevertStartDrip() public {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
         token.startDripping(user1);
-        vm.expectRevert(bytes("user already accruing"));
+        vm.expectRevert(DRIP20.UserAlreadyAccruing.selector);
         token.startDripping(user1);
     }
 
     function testRevertStopDrip() public {
         // need to start on a non zero block number since we use block 0 as 'not dripping'
         vm.roll(1);
-        vm.expectRevert(bytes("user not accruing"));
+        vm.expectRevert(DRIP20.UserNotAccruing.selector);
         token.stopDripping(user1);
     }
 }

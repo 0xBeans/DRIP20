@@ -8,8 +8,14 @@ pragma solidity ^0.8.0;
 ///@notice should accrue 3 times as many tokens per block. This user would have a multiplier of 3.
 ///@notice shout out to solmate (@t11s) for the slim and efficient ERC20 implementation!
 ///@notice shout out to superfluid and UBI for the dripping inspiration!
-
 abstract contract GIGADRIP20 {
+    /*==============================================================
+    ==                            ERRORS                          ==
+    ==============================================================*/
+
+    error UserNotAccruing();
+    error ERC20_TransferToZeroAddress();
+
     /*==============================================================
     ==                            EVENTS                          ==
     ==============================================================*/
@@ -138,7 +144,7 @@ abstract contract GIGADRIP20 {
         address to,
         uint256 amount
     ) internal virtual {
-        require(to != address(0), "ERC20: transfer to the zero address");
+        if (to == address(0)) revert ERC20_TransferToZeroAddress();
 
         Accruer storage fromAccruer = _accruers[from];
         Accruer storage toAccruer = _accruers[to];
@@ -203,7 +209,7 @@ abstract contract GIGADRIP20 {
         Accruer storage accruer = _accruers[addr];
 
         // should I check for 0 multiplier too
-        require(accruer.accrualStartBlock != 0, "user not accruing");
+        if (accruer.accrualStartBlock == 0) revert UserNotAccruing();
 
         accruer.balance = balanceOf(addr);
         _currAccrued = totalSupply();
