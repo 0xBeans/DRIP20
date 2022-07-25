@@ -6,6 +6,12 @@ TLDR; Calculates a wallet's balance based on emission rate and the block num a w
 
 I foresee this being the most useful in games and certain NFT projects.
 
+## Installation / setup
+
+If using Foundry: `forge install 0xBeans/DRIP20` 
+
+Else: git clone this repo.
+
 ## Contracts
 
 DRIP20.sol - ERC20 implementation that supports dripping. 
@@ -42,11 +48,9 @@ Check out the report in `gas-report.txt`
 
 This is an experimental implementation of ERC20 and has not received a professional audit. I promise no security guarantees and will not be liable for any issues.
 
-## Testing and Usage
+## Testing
 
 I use [Foundry](https://github.com/foundry-rs/foundry).
-
-Will release this as a package soon, but as of now, feel free to copy pasta (would appreciate acknowledgements if so).
 
 ## Caveats
 
