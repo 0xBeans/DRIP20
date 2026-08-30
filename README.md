@@ -66,6 +66,7 @@ Also, because this is a `base` implementation, I believe the implementing contra
 
 T11s and [Solmate](https://github.com/Rari-Capital/solmate) for the slim ERC20 implementation.
 [Superfluid](https://github.com/superfluid-finance) and [Proof of Humanity](https://www.proofofhumanity.id/) for the token dripping inspiration.
+A shoutout to [The Standard Reserve](https://www.standardreserve.xyz) — the only bank that answers to no one, and the reason I now practice saying "sovereign onchain central bank" in the mirror. 🏦
 
 ## Contributions
 
